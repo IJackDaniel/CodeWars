@@ -6,13 +6,13 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
-public class TaskFileCreator {
+public class _TaskFileCreator {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
         System.out.print("Enter task name: ");
         String classNameInput = scanner.nextLine().trim();
-        String originalName = classNameInput; // Сохраняем оригинальное имя с пробелами
+        String originalName = classNameInput; // Сохраняем оригинальное имя с пробелами и апострофами
 
         // Ввод сложности задачи
         int difficulty = 0;
@@ -36,10 +36,10 @@ public class TaskFileCreator {
             functionName = scanner.nextLine().trim();
         }
 
-        // Validate class name (теперь заменяем пробелы на _ перед валидацией)
+        // Validate class name (заменяем пробелы на _ и удаляем апострофы перед валидацией)
         String className;
         try {
-            className = validateAndCreateClassName(classNameInput.replace(' ', '_'));
+            className = validateAndCreateClassName(classNameInput.replace(' ', '_').replace("'", ""));
         } catch (IllegalArgumentException e) {
             System.err.println("Error: " + e.getMessage());
             scanner.close();
@@ -60,7 +60,7 @@ public class TaskFileCreator {
         }
 
         // Create file content without package declaration
-        String fileContent = "// Task name: " + originalName + "\n"  // Используем оригинальное имя здесь
+        String fileContent = "// Task name: " + originalName + "\n"  // Используем оригинальное имя с апострофами
                 + "// Difficulty: " + difficulty + " kyu\n"
                 + "// Condition: Task has not been solved\n"
                 + "// Date of creation: " + LocalDate.now().format(DateTimeFormatter.ISO_DATE) + "\n"
@@ -107,7 +107,7 @@ public class TaskFileCreator {
 
         for (int i = 1; i < className.length(); i++) {
             if (!Character.isJavaIdentifierPart(className.charAt(i))) {
-                throw new IllegalArgumentException("Invalid character in class name: '" +
+                throw new IllegalArgumentException("Invalid character in task name: '" +
                         className.charAt(i) + "'");
             }
         }
