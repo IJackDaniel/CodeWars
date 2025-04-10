@@ -14,6 +14,28 @@ public class TaskFileCreator {
         String classNameInput = scanner.nextLine().trim();
         String originalName = classNameInput; // Сохраняем оригинальное имя с пробелами
 
+        // Ввод сложности задачи
+        int difficulty = 0;
+        while (difficulty < 1 || difficulty > 8) {
+            System.out.print("Enter task difficulty (1-8): ");
+            try {
+                difficulty = Integer.parseInt(scanner.nextLine());
+                if (difficulty < 1 || difficulty > 8) {
+                    System.out.println("Difficulty must be between 1 and 8");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter a valid number between 1 and 8");
+            }
+        }
+
+        // Ввод названия функции
+        System.out.print("Enter function name: ");
+        String functionName = scanner.nextLine().trim();
+        while (!isValidFunctionName(functionName)) {
+            System.out.print("Invalid function name. Enter valid function name: ");
+            functionName = scanner.nextLine().trim();
+        }
+
         // Validate class name (теперь заменяем пробелы на _ перед валидацией)
         String className;
         try {
@@ -39,11 +61,21 @@ public class TaskFileCreator {
 
         // Create file content without package declaration
         String fileContent = "// Task name: " + originalName + "\n"  // Используем оригинальное имя здесь
+                + "// Difficulty: " + difficulty + " kyu\n"
                 + "// Condition: Task has not been solved\n"
                 + "// Date of creation: " + LocalDate.now().format(DateTimeFormatter.ISO_DATE) + "\n"
                 + "\n"
                 + "public class " + className + " {\n"
-                + "    public static void main(String[] args) {\n\n\t}\n"
+                + "    public static void main(String[] args) {\n"
+                + "        var result = " + functionName + "();\n"
+                + "        System.out.println(result);\n"
+                + "        result = " + functionName + "();\n"
+                + "        System.out.println(result);\n"
+                + "    }\n"
+                + "\n"
+                + "    static String " + functionName + "() {\n"
+                + "        return \"Function '" + functionName + "' result\";\n"
+                + "    }\n"
                 + "}";
 
         // Create Java file in src directory
@@ -105,5 +137,28 @@ public class TaskFileCreator {
             }
         }
         return false;
+    }
+
+    private static boolean isValidFunctionName(String name) {
+        if (name == null || name.trim().isEmpty()) {
+            return false;
+        }
+
+        String trimmedName = name.trim();
+        if (trimmedName.isEmpty()) {
+            return false;
+        }
+
+        if (!Character.isJavaIdentifierStart(trimmedName.charAt(0))) {
+            return false;
+        }
+
+        for (int i = 1; i < trimmedName.length(); i++) {
+            if (!Character.isJavaIdentifierPart(trimmedName.charAt(i))) {
+                return false;
+            }
+        }
+
+        return !isJavaKeyword(trimmedName);
     }
 }
